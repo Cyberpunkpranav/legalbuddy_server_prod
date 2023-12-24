@@ -1,0 +1,15 @@
+config: containsconfig: contains configuration files, such as database configuration or environment variables.
+
+controllers: contains the controllers responsible for handling the requests and responses for each route.
+
+middleware: contains the middleware functions that can modify the incoming request or outgoing response, or perform additional actions.
+
+models: contains the database models used by the controllers to interact with the database.
+
+routes: contains the route definitions for the Express application.
+
+services: contains the business logic of the application, which is used by the controllers to perform actions.
+
+app.js is the main file of the application, which sets up the Express app and connects the routes, middleware, and controllers.
+
+package.json contains the dependencies and metadata of the project.
