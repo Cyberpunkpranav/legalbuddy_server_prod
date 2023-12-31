@@ -140,3 +140,75 @@ export const Search_Clauses = (req,res,next)=>{
     }
 
 }
+async function Get_clause_By_name_helper(id,res,next){
+    return  new Promise((resolve,reject)=>{
+       let query = `SELECT * FROM public_clause_alternates WHERE public_clause_alternates.clause_id=? AND status=1`
+        db.query(query,[id],(async(err,result)=>{
+            if(err){
+                res.json(err)
+                // next(err)   
+            }else{
+                let arr = []
+                for(let i=0; i<result.length;i++){
+                    try {
+                        // let file_path = join(currentDir, '..', '..', 'assets', 'clauses', result[i].file_name);
+                        // const data = readFileSync(file_path, 'utf8' )
+                        let S3_URL_Simple,S3_URL_Moderate,S3_URL_Complex;
+                        if(result[i].simple !==undefined && result[i].simple !==null){
+                         S3_URL_Simple = await GetObjects(`assets/clauses/${result[i].simple}`)
+                        }
+                        if(result[i].moderate !== undefined && result[i].moderate !== null){
+                            S3_URL_Moderate = await GetObjects(`assets/clauses/${result[i].moderate}`)
+                        }
+                        if(result[i].complex !== undefined && result[i].complex !==null){
+                            S3_URL_Complex = await GetObjects(`assets/clauses/${result[i].complex}`)
+                        }
+    
+                          res.setHeader('Content-Type', 'text/html');
+                          let obj = {
+                            id:result[i].id,
+                            rationale:result[i].rationale,
+                            explaination:result[i].explaination,
+                            clause_id: result[i].clause_id,
+                            nature: result[i].nature,
+                            simple: S3_URL_Simple !==undefined?S3_URL_Simple:'',
+                            moderate:S3_URL_Moderate!==undefined?S3_URL_Moderate:'',
+                            complex:S3_URL_Complex!==undefined ?S3_URL_Complex:'',
+                            status: result[i].status,
+                            created_on: result[i].created_on,
+                            updated_on: result[i].updated_on
+                        }
+                        arr.push(obj)   
+                    } catch (error) {
+                      next(error);
+                    }
+                }
+                resolve(arr)
+            }
+        }))
+    })
+    }
+export const Get_Clause_by_name =async(req,res,next)=>{
+    let query;
+    const clause_name = req.query.clause_name
+    try {   
+        query = `SELECT id, clause_name,definition,rationale FROM public_clauses WHERE clause_name = ?`
+             db.query(query,[clause_name],(async(err,result)=>{
+            if(err){
+                next(err)
+            }else{
+                const clauses =  await Get_clause_By_name_helper(result[0].id,res,next)
+                response.clauses = clauses
+                response.clause_name = result[0].clause_name
+                response.definition = result[0].definition
+                response.rationale = result[0].rationale
+                response.status = true
+                res.json(response)
+            }
+        }))
+
+    } catch (error) {
+        next(error)
+    }
+
+}
