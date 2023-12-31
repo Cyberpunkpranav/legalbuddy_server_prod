@@ -173,8 +173,8 @@ export const Update_Clause = async (req,res,next) => {
   
       for (let i = 0; i < clauses.length; i++) {
         let id = Number(clauses[i].id);
-        let rationale = clauses[i].rationale ?clauses[i].rationale:'n/a'
-        let explaination = clauses[i].explaination?clauses[i].explaination:'n/a'
+        let rationale = clauses[i].rationale ?clauses[i].rationale:''
+        let explaination = clauses[i].explaination?clauses[i].explaination:''
         let simple = clauses[i].simple;
         let moderate = clauses[i].moderate;
         let complex = clauses[i].complex;
